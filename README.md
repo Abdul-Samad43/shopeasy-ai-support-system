@@ -73,21 +73,23 @@ Rather than relying entirely on an LLM's general knowledge, the system uses retr
 
 ```mermaid
 flowchart TD
-    A[Customer Query] --> B[n8n Support Workflow]
-    B --> C[AI Agent]
-    C --> D[LLM Provider]
-    C --> E[Order Status Tool]
-    C --> F[Qdrant Vector Search]
-    F --> G[Support Policy Knowledge Base]
-    C --> H[Response and Escalation Logic]
+    A["Customer Query"] --> B["n8n Workflow"]
+    B --> C["AI Agent"]
+    C --> D["LLM Provider"]
+    C --> E["Order Status Tool"]
+    C --> F["Qdrant Vector Search"]
+    F --> G["Support Policy Knowledge Base"]
+    D --> H["Response and Escalation"]
     E --> H
     G --> H
-    H --> I[Customer Response]
-    H --> J[PostgreSQL Ticket Records]
-    H --> K[Discord Notifications]
-    L[Policy Ingestion Workflow] --> M[Document Processing and Embeddings]
+    H --> I["Customer Response"]
+    H --> J["PostgreSQL Ticket Records"]
+    H --> K["Discord Notifications"]
+
+    L["Policy Ingestion Workflow"] --> M["Generate Embeddings"]
     M --> F
-    N[Scheduled Reporting Workflow] --> O[PostgreSQL Report Query]
+
+    N["Daily Report Workflow"] --> O["PostgreSQL Report Query"]
     O --> K
 ```
 
