@@ -1,0 +1,165 @@
+{
+  "name": "Daily Report",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0ad1168a-de8f-47db-8b54-c038030b5171",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  COUNT(*) FILTER (WHERE created_at >= now() - interval '24 hours') AS last_24h,\n  COUNT(*) FILTER (WHERE status = 'open') AS open_now,\n  COUNT(*) AS total\nFROM tickets;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "0f0f7d50-2692-4aa0-9d57-5f018d1b3f28",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "Q7HckRahVJwBdJ4R",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "923024a6-1d56-4533-a84f-81c1305b077e",
+              "name": "report",
+              "value": "={{ \"📊 ShopEasy Daily Report\\nTickets in last 24h: \" + $json.last_24h + \"\\nOpen tickets now: \" + $json.open_now + \"\\nTotal tickets: \" + $json.total }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        -64
+      ],
+      "id": "e1bc865f-eb84-4c61-9e70-5846142fe68b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ $json.report }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        704,
+        144
+      ],
+      "id": "0222103f-bf43-46d4-b783-c104b693b7a9",
+      "name": "Discord",
+      "webhookId": "fae60406-3176-4afe-af4c-f892293d2856",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "ZetjRkJg2kiCJ6aA",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        288,
+        208
+      ],
+      "id": "60288308-3460-418b-80ea-5e49719aae23",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Karachi",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "13267be2-8715-49f5-ae28-8935fcd4269b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "67df97840f393b82e7c092f49a6467c3b037031bbcf62da11cda8e12d3a49765"
+  },
+  "nodeGroups": [],
+  "id": "Lc96JFcmgOkCTaAV",
+  "tags": []
+}

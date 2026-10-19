@@ -1,0 +1,43 @@
+services:
+  support-db:
+    image: postgres:16
+    container_name: support-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: support
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: support
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - support_pg_data:/var/lib/postgresql/data
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=Asia/Karachi
+      - TZ=Asia/Karachi
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - support-db
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  support_pg_data:
+    external: true
+  n8n_data:
+    external: true
+  qdrant_data:
